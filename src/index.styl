@@ -1,0 +1,121 @@
+@require './open-color.styl'
+
+$lottery = 'Apple SD Gothic Neo', 'AppleGothic', 'Noto Sans CJK KR', 'Noto Sans Korean', 'Malgun Gothic', '맑은 고딕', 'NanumBarunGothic', '나눔바른고딕', 'Dotum', sans-serif
+$monofonts = Consolas, Courier, monospace
+
+*
+    margin: 0
+    padding: 0
+    font-family: $lottery
+    font-size: 1rem
+
+li
+    list-style: none
+
+button
+    padding .3rem 1rem
+    margin .3rem
+
+main
+    display: flex
+
+#runArea
+    flex-grow: 1
+    width: 0
+
+html
+    font-size: 11pt
+
+#textCode
+    display: block
+    width: 50rem
+    height: 30rem
+
+#textStdin
+    display: block
+    width: 50rem
+    height: 20rem
+
+#output
+    background: oc-gray-1
+    width: 49rem
+    overflow-x: auto
+    //white-space: nowrap
+
+.stderr
+    color: oc-red-7
+    font-weight: bold
+
+.stackNumber
+    font-size: 1.2rem
+    padding-right: 10px
+    flex-shrink: 1
+    &:before
+        content: '['
+        font-family: $monofonts
+        color: oc-gray-5
+    &:after
+        content: ']'
+        font-family: $monofonts
+        color: oc-gray-5
+
+#stacksList
+    &>li
+        border: 3px solid white
+        display: flex
+        &.selected
+            background: oc-yellow-2
+
+ul.stack
+    display: inline-block
+    white-space: nowrap
+    overflow-x: auto
+    overflow-y: hidden
+    flex-grow: 1
+    width: 100%
+
+    &>li
+        font-family: $monofonts
+        display: inline-block
+        padding: 7px .8rem
+        height: 100%
+        &:not(:first-child)
+            border-left: 1px solid oc-gray-5
+
+.command
+    font-family: $monofonts
+    white-space: nowrap
+    span.cmdIndex
+        font-family: $monofonts
+        white-space: nowrap
+        margin-right: .3rem
+        &:before
+            content: '['
+            color: oc-gray-5
+        &:after
+            content: ']'
+            color: oc-gray-5
+
+.registerKey
+    font-family: $monofonts
+    font-weight: normal
+    margin-right: .5rem
+    &:before
+        content: '('
+        color: oc-pink-7
+    &:after
+        content: ')'
+        color: oc-pink-7
+    .comma
+        font-family: $monofonts
+        color: oc-pink-3
+
+#registerList
+    display: flex
+    flex-wrap: wrap
+    li
+        padding: 7px 1rem
+        margin: .1rem
+        border: 1px solid oc-gray-5
+        &.selected
+            background: oc-yellow-2

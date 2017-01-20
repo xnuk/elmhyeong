@@ -1,0 +1,42 @@
+machine:
+    environment:
+        PATH: "${PATH}:${HOME}/.yarn/bin:${HOME}/.cpus/bin"
+    node:
+        version: 7.4.0
+
+dependencies:
+    pre:
+        - |
+          if [[ ! -e ~/.yarn/bin/yarn ]]; then
+            curl -o- -L https://yarnpkg.com/install.sh | bash
+          fi
+
+        - |
+          if ! hash sysconfcpus 2>/dev/null; then
+            git clone --depth=1 https://github.com/obmarg/libsysconfcpus.git "$HOME/libsysconfcpus";
+            cd "$HOME/libsysconfcpus";
+            ./configure --prefix="$HOME/.cpus";
+            make -j2 install;
+          fi
+
+    override:
+        - yarn
+
+test:
+    override:
+        - sysconfcpus -n 2 yarn elm-make || rm -rf node_modules/elm && yarn add elm
+        - sysconfcpus -n 2 yarn webpack
+        - sysconfcpus -n 2 yarn elm-test
+
+deployment:
+    publish:
+        branch: master
+        commands:
+            - |
+              git config --global user.email "admin@xnu.kr";
+              git config --global user.name "Xnuk Shuman";
+              git checkout -b gh-pages;
+
+            - perl dystopia.pl && mv dist/* . && rm dist -d && git add --all
+            - git commit -m 'update [skip ci]'
+            - git push -f origin gh-pages
