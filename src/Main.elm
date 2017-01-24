@@ -21,7 +21,7 @@ update msg model = (\x -> (x, Cmd.none)) <| case msg of
     MsgNext -> next model
     MsgReset ->
         let newModel = resetRunner model
-        in {newModel| state = Edit}
+        in {newModel| state = Edit, autoRun = False}
     MsgAuto -> {model| autoRun = model.state == Run && not model.autoRun}
 
 subscriptions : Model -> Sub Msg
