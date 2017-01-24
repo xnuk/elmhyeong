@@ -147,6 +147,14 @@ pushMany cursor rs model = if model.state /= Run then model else case cursor of
 
     _ -> modifyStack cursor model <| \stack -> List.foldl Stack.push stack rs
 
+-- right-first push
+pushManyR : Int -> List Rational -> Model -> Model
+pushManyR cursor rs model = if model.state /= Run then model else case cursor of
+    1 -> putOutput (Stdout (String.concat (List.map strRatio rs))) model
+    2 -> putOutput (Stderr (String.concat (List.map strRatio rs))) model
+
+    _ -> modifyStack cursor model <| \stack -> List.foldr Stack.push stack rs
+
 pushManyCurrent : List Rational -> Model -> Model
 pushManyCurrent rs model =
     let (current, _) = model.stacks
@@ -234,7 +242,7 @@ next model = case model.state of
     ExitAbnormal -> model
     Edit -> {model| state = Run}
         |> resetRunner
-        |> pushMany 0 (List.map Ratio.fromInt (toCodePoints model.stdin))
+        |> pushManyR 0 (List.map Ratio.fromInt (toCodePoints model.stdin))
         |> next
     Run -> case Array.get model.nextCommandIndex model.commands of
         Nothing ->
