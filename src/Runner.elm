@@ -232,7 +232,8 @@ runHeart chardot hearttree model = if model.state /= Run then model else case he
         let (x, newModel) = popCurrent model
             isNan = Ratio.denominator x == 0
             leftOrRight =
-                if x |== chardot then left -- x == chardot/1
+                if isNan then right
+                else if x |== chardot then left -- x == chardot/1
                 else right
         in runHeart chardot leftOrRight newModel
 
