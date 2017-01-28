@@ -11,7 +11,10 @@ t label problem answer = test label <| \() ->
     Expect.equal [answer] (List.map showCommandPrefix (parse problem))
 
 all : Test
-all = describe "syntax"
+all = describe "test" [syntax]
+
+syntax : Test
+syntax = describe "syntax"
     [ describe "한글 해석"
         [ t "형 should be 형 1 0" "형" "형 1 0"
         , t "항 should be 항 1 0" "항" "항 1 0"

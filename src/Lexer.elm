@@ -67,26 +67,36 @@ listTail = withDefault [] << List.tail
 -- - 말줄임표 해석 단계에선 `.`과 세 개짜리 말줄임표 문자들만 소모합니다.
 -- - 하트 구역 해석 단계에선 `!`, `?`와 하트 문자들만 소모합니다.
 -- - 두 해석 단계 모두 한글 글자 해석 단계에서 해석이 가능하다면 해석 단계를 중단합니다.
-inst : List Token -> List SemiCmd
-inst tokens =
+instStep : List Token -> (Maybe SemiCmd, List Token)
+instStep tokens =
     let next = listTail tokens
     in case List.head tokens of
-        Nothing -> []
-        Just (Single a) -> SemiInst (a, 1) :: inst next
+        Nothing -> (Nothing, [])
+        Just (Single a) -> (Just <| SemiInst (a, 1), next)
         Just (Start a) ->
             let (left, right) = break (isEnd a) next -- End 토큰이 있기 전까지 잡아 left에 저장. End 토큰 이후로는 right에 저장.
                 newNext = listTail right
             in case List.head right of
-                Nothing -> inst next -- End 토큰이 없어서 left == tokens인 경우
+                Nothing -> (Nothing, next) -- End 토큰이 없어서 left == tokens인 경우
                 Just (End end) ->
                     let len = hangulLength left + 2 -- left에는 Start와 End 토큰이 없기 때문에 2를 더함.
-                    in SemiInst (end, len) :: inst newNext
+                    in (Just <| SemiInst (end, len), newNext)
 
-                _ -> inst next
+                _ -> (Nothing, next)
 
-        Just (Dot a) -> SemiDot a :: inst next
-        Just (Heart a) -> SemiHeart a :: inst next
-        Just _ -> inst next
+        Just (Dot a) -> (Just <| SemiDot a, next)
+        Just (Heart a) -> (Just <| SemiHeart a, next)
+        Just _ -> (Nothing, next)
+
+inst : List Token -> List SemiCmd
+inst =
+    let f cmds tokens =
+            if List.isEmpty tokens then
+                cmds
+            else case instStep tokens of
+                (Nothing, next) -> f cmds next
+                (Just a, next) -> f (cmds ++ [a]) next
+    in f []
 
 addDot : Int -> Maybe (CommandT a) -> Maybe (CommandT a)
 addDot n cmd =
