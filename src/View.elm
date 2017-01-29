@@ -1,8 +1,8 @@
 module View exposing (view, Msg(..))
 
-import Html exposing (Html, text, textarea, button, div, p, pre, li, strong, span, main_)
-import Html.Attributes exposing (disabled, id, placeholder, class, classList)
-import Html.Events exposing (onInput, onClick)
+import Html exposing (Html, text, textarea, button, input, label, div, p, pre, li, strong, span, main_)
+import Html.Attributes exposing (disabled, id, placeholder, class, classList, type_, checked)
+import Html.Events exposing (onInput, onClick, onCheck)
 import Html.Keyed exposing (ul)
 
 import Maybe exposing (withDefault)
@@ -17,7 +17,7 @@ import String.Extra exposing (fromCodePoints)
 
 import Array
 
-type Msg = MsgInput String | MsgCode String | MsgNext | MsgReset | MsgAuto
+type Msg = MsgInput String | MsgCode String | MsgNext | MsgReset | MsgAuto | MsgWrap Bool
 
 textCode : Model -> Html Msg
 textCode model = textarea
@@ -36,11 +36,23 @@ textStdin model = textarea
     [ text model.stdin ]
 
 textOutput : Model -> Html a
-textOutput {output} =
+textOutput {output, wordWrap} =
     let toHtml x = case x of
-            Stdout a -> pre [ class "stdout" ] [ text a ]
-            Stderr a -> pre [ class "stderr" ] [ text a ]
+            Stdout a -> pre [ classList
+                [ ("stdout", True)
+                , ("wrap", wordWrap)
+                ] ] [ text a ]
+            Stderr a -> pre [ classList
+                [ ("stderr", True)
+                , ("wrap", wordWrap)
+                ] ] [ text a ]
     in div [ id "output" ] <| Array.toList <| Array.map toHtml output
+
+checkWrap : Model -> Html Msg
+checkWrap {wordWrap} = label []
+    [ input [ type_ "checkbox", checked wordWrap, onCheck MsgWrap ] []
+    , text "자동 줄바꿈"
+    ]
 
 btnNext : Model -> Html Msg
 btnNext _ = button [ onClick MsgNext, id "btnNext" ] [ text "다음▶" ]
@@ -139,6 +151,7 @@ view model =
             , Just btnNext
             , notEdit btnAuto
             , notEdit btnReset
+            , notEdit checkWrap
             , isEdit textStdin
             , notEdit textOutput
             ]

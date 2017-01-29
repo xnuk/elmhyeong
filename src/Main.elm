@@ -23,6 +23,7 @@ update msg model = (\x -> (x, Cmd.none)) <| case msg of
         let newModel = resetRunner model
         in {newModel| state = Edit, autoRun = False}
     MsgAuto -> {model| autoRun = model.state == Run && not model.autoRun}
+    MsgWrap b -> {model| wordWrap = b}
 
 subscriptions : Model -> Sub Msg
 subscriptions {autoRun} =

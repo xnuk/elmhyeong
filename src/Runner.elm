@@ -30,6 +30,7 @@ type alias Model =
     , state : RunState
     , rawCode : String
     , autoRun : Bool
+    , wordWrap : Bool
     }
 
 nan : Rational
@@ -83,6 +84,7 @@ initModel =
         ++ "혀어어엉.. 하앙. 항. 형... 하앙. 혀엉.... 하앙. 흑... 항. 형... 흡  하앗.\n"
         ++ "혀엉..... 흑. 흣"
     , autoRun = False
+    , wordWrap = False
     }
 
 resetRunner : Model -> Model
