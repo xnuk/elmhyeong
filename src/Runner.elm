@@ -237,14 +237,14 @@ runHeart chardot hearttree model = if model.state /= Run then model else case he
                 else right
         in runHeart chardot leftOrRight newModel
 
-next : Model -> Model
-next model = case model.state of
+nextStep : Model -> Model
+nextStep model = case model.state of
     ExitNormal -> model
     ExitAbnormal -> model
     Edit -> {model| state = Run}
         |> resetRunner
         |> pushManyR 0 (List.map Ratio.fromInt (toCodePoints model.stdin))
-        |> next
+        |> nextStep
     Run -> case Array.get model.nextCommandIndex model.commands of
         Nothing ->
             if model.nextCommandIndex == 0 then
@@ -280,3 +280,63 @@ next model = case model.state of
                             |> move dotlen
                 heartModel = runHeart (charlen * dotlen) hearttree instModel
             in {heartModel| lastCommandIndex = model.nextCommandIndex}
+
+next : Model -> Model
+next model =
+    if model.autoRun && model.state == Run then
+        -- next 50 times
+        model
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+            |> nextStep
+        -- because I'm lazy
+        -- TODO: make customizable
+    else
+        nextStep model

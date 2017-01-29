@@ -27,6 +27,6 @@ update msg model = (\x -> (x, Cmd.none)) <| case msg of
 subscriptions : Model -> Sub Msg
 subscriptions {autoRun} =
     if autoRun then
-        every (1 * millisecond) (always MsgNext)
+        every (16 * millisecond) (always MsgNext)
     else
         Sub.none

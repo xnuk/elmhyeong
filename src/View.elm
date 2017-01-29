@@ -1,6 +1,6 @@
 module View exposing (view, Msg(..))
 
-import Html exposing (Html, text, textarea, button, div, p, code, li, strong, span, main_)
+import Html exposing (Html, text, textarea, button, div, p, pre, li, strong, span, main_)
 import Html.Attributes exposing (disabled, id, placeholder, class, classList)
 import Html.Events exposing (onInput, onClick)
 import Html.Keyed exposing (ul)
@@ -38,8 +38,8 @@ textStdin model = textarea
 textOutput : Model -> Html a
 textOutput {output} =
     let toHtml x = case x of
-            Stdout a -> span [ class "stdout" ] [ text a ]
-            Stderr a -> span [ class "stderr" ] [ text a ]
+            Stdout a -> pre [ class "stdout" ] [ text a ]
+            Stderr a -> pre [ class "stderr" ] [ text a ]
     in div [ id "output" ] <| Array.toList <| Array.map toHtml output
 
 btnNext : Model -> Html Msg
@@ -51,20 +51,24 @@ btnReset _ = button [ onClick MsgReset, id "btnReset" ] [ text "초기화" ]
 btnAuto : Model -> Html Msg
 btnAuto {autoRun} = button [ onClick MsgAuto, id "btnAuto" ] [ text <| if autoRun then "중단" else "실행" ]
 
-preText attrs t = code attrs [text t]
-
 stacks : Model -> Html a
 stacks model =
     let (cursor, stacks) = model.stacks
         hash (key, stack) =
             let keyStr = toString key
-                inner = Stack.toList stack
-                    |> List.map (\r -> li [] [text (showRatio r)])
+                stackList = Stack.toList stack
+                len = List.length stackList
+                elem i r = (toString (len - i), li [] [text (showRatio r)])
+                inner = List.indexedMap elem
+                    <| if model.autoRun then
+                            List.take 40 stackList -- for perfomance
+                            -- TODO: make customizable
+                       else stackList
                 prefix = strong [class "stackNumber"] [text keyStr]
             in (keyStr,
                 li [
                     classList [("selected", cursor == key)]
-                ] [prefix, Html.ul [class "stack"] inner]
+                ] [prefix, ul [class "stack"] inner]
             )
     in div [id "stacksDiv"]
         [ p [] [ text ("현재 스택: " ++ toString cursor) ]
