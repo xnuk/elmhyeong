@@ -2,8 +2,9 @@
 
 ```bash
 
+# prerequisites: java, yarn
 yarn
-yarn webpack
+NODE_ENV=production yarn webpack
 
 # yarn webpack이 동작하지 않을 경우
 rm -rf node_modules/elm && yarn add elm

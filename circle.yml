@@ -3,8 +3,14 @@ machine:
         PATH: "${PATH}:${HOME}/.yarn/bin:${HOME}/.cpus/bin"
     node:
         version: 7.4.0
+    java:
+        version: openjdk8
 
 dependencies:
+    cache_directories:
+        - node_modules/
+        - ~/.cpus/
+        - ~/.yarn/
     pre:
         - |
           if [[ ! -e ~/.yarn/bin/yarn ]]; then
@@ -25,7 +31,7 @@ dependencies:
 test:
     override:
         - sysconfcpus -n 2 yarn elm-make || rm -rf node_modules/elm && yarn add elm
-        - sysconfcpus -n 2 yarn webpack
+        - NODE_ENV=production sysconfcpus -n 2 yarn webpack
         - sysconfcpus -n 2 yarn elm-test
 
 deployment:

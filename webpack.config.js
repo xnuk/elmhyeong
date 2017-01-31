@@ -3,6 +3,7 @@ const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require("extract-text-webpack-plugin")
 const BrowserSyncPlugin = require('browser-sync-webpack-plugin')
+const ClosureCompilerPlugin = require('webpack-closure-compiler')
 
 module.exports = {
 	entry: './src/index.js',
@@ -30,7 +31,19 @@ module.exports = {
 			}
 		]
 	},
+
 	plugins: [
+		process.env.NODE_ENV !== 'production' ? null :
+		new ClosureCompilerPlugin({
+			compiler: {
+				compilation_level: 'ADVANCED',
+				language_in: 'ECMASCRIPT5_STRICT',
+				language_out: 'ECMASCRIPT5_STRICT'
+			},
+			concurrency: 2
+		}),
+
+		process.env.NODE_ENV !== 'production' ? null :
 		new webpack.optimize.UglifyJsPlugin({
 			compress: {
 				sequences: true,
@@ -65,6 +78,7 @@ module.exports = {
 				props: false
 			}
 		}),
+
 		new ExtractTextPlugin('index.css'),
 		new HtmlWebpackPlugin({
 			template: './src/index.html',
@@ -72,11 +86,13 @@ module.exports = {
 				collapseWhitespace: true
 			}
 		}),
+
+		process.env.NODE_ENV === 'production' ? null :
 		new BrowserSyncPlugin({
 			host: 'localhost',
 			port: 3000,
 			server: {baseDir: ['dist']},
 			injectChanges: true
 		})
-	]
+	].filter(v => v != null)
 }
