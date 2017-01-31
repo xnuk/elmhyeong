@@ -33,7 +33,7 @@ module.exports = {
 	},
 
 	plugins: [
-		process.env.NODE_ENV !== 'production' ? null :
+		process.env.NODE_ENV === 'production' ? null :
 		new ClosureCompilerPlugin({
 			compiler: {
 				compilation_level: 'ADVANCED',
